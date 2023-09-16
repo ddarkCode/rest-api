@@ -3,10 +3,16 @@
 const express = require('express');
 const debug = require('debug')('app');
 const { connect } = require('mongoose');
+const morgan = require('morgan');
 
 const Book = require('./models/bookModel');
+const bookRouter = require('./routes/bookRouter');
 
 const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('combined'));
 
 (async function mongo() {
   try {
@@ -16,31 +22,6 @@ const app = express();
   }
 }());
 
-const bookRouter = express.Router();
-
-bookRouter.route('/books').get(async (req, res) => {
-  const query = {};
-  if (req.query.genre) {
-    query.genre = req.query.genre;
-  }
-  try {
-    const books = await Book.find(query);
-    return res.json(books);
-  } catch (err) {
-    debug(err);
-  }
-});
-
-bookRouter.route('/books/:bookId').get(async (req, res) => {
-  const { bookId } = req.params;
-  try {
-    const book = await Book.findById(bookId);
-    return res.json(book);
-  } catch (err) {
-    debug(err);
-  }
-});
-
-app.use('/api', bookRouter);
+app.use('/api', bookRouter(Book));
 
 app.listen(3000, () => debug('App running on port 3000.'));

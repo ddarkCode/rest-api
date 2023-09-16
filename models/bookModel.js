@@ -2,12 +2,10 @@
 const { Schema, model } = require('mongoose');
 
 const bookSchema = new Schema({
-  title: {
-    type: String,
-    author: String,
-    genre: String,
-    read: false,
-  },
+  title: String,
+  author: String,
+  genre: String,
+  read: { type: Boolean, default: false },
 });
 
 module.exports = model('Book', bookSchema);
